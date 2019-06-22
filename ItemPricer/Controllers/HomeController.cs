@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ItemPricer.Service;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -8,23 +10,25 @@ namespace ItemPricer.Controllers
 {
     public class HomeController : Controller
     {
+        private ItemService _itemService;
+
         public ActionResult Index()
         {
-            return View();
+            _itemService = new ItemService();
+            return View(_itemService.GetHighestPricedItems());
         }
 
-        public ActionResult About()
+        [HttpGet]
+        public string GetPrice(string itemName)
         {
-            ViewBag.Message = "Your application description page.";
+            //Creating Web Service reference object  
+            PricerWebService.PricerWebService objPayRef = new PricerWebService.PricerWebService();
 
-            return View();
-        }
+            //calling and storing web service output into the variable  
+            var result = objPayRef.GetMaxPriceOfItem(itemName);
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            return result >= 0 ? result.ToString("C2") : "No matching item was found.";
 
-            return View();
         }
     }
 }
